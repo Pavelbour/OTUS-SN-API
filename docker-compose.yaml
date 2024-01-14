@@ -1,0 +1,46 @@
+services:
+  app:
+    restart: unless-stopped
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    secrets:
+      - postgres-password
+      - postgres-user
+      - postgres-db
+    networks:
+      - otus_sn_api_network
+
+  postgres:
+    image: postgres:16.1
+    restart: unless-stopped
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+      - POSTGRES_USER_FILE=/run/secrets/postgres-user
+      - POSTGRES_DB_FILE=/run/secrets/postgres-db
+    secrets:
+      - postgres-password
+      - postgres-user
+      - postgres-db
+    volumes:
+      - otus_sn_api_postgres_data_volume:/var/lib/postgresql/data
+    networks:
+      - otus_sn_api_network
+
+networks:
+  otus_sn_api_network:
+
+volumes:
+  otus_sn_api_postgres_data_volume:
+
+secrets:
+  postgres-password:
+    environment: "POSTGRES_PASSWORD"
+  postgres-user:
+    environment: "POSTGRES_USER"
+  postgres-db:
+    environment: "POSTGRES_DB"
