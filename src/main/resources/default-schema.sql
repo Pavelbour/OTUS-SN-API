@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     last_name varchar(50),
     birthday date,
     biography varchar,
-    city varchar(30),
+    city varchar(50),
     password varchar(100) NOT NULL
 );

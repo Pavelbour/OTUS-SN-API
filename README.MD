@@ -16,7 +16,7 @@
 - Регистрация нового пользователя. <code>curl -X POST http://localhost:8080/user/register --json '{
     "firstName": "Petya",
     "lastName": "Zotov",
-    "city": "Omsk",
+    "city": "Omsk",v
     "birthday":"1990-05-18",
     "biography": "Coder",
     "password": "Petya@password"
@@ -31,3 +31,11 @@
     Поля userId и password обязательные.
 
 - Анкета пользователя. <code>curl http://localhost:8080/user/d59e30a8-339e-48c6-bc7a-22bfceaaf432</code>
+
+- Поиск пользователей по имени и фамилии <code>curl --location 'localhost:8080/user/search?firstName=%D0%90%D1%80&lastName=%D0%90%D0%B3'</code>
+
+## Нагрузочное тестирование
+
+Отчёт по нагрузочному тестированию находится в папке [doc/performance-test](doc/performance-test). В папке [doc/performance-test/jmeter](doc/performance-test/jmeter) 
+ расположены тестовые планы для jmeter и отчёты сгенерированные им.
+ 
