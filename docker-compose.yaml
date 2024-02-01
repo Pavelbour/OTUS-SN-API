@@ -7,6 +7,7 @@ services:
     ports:
       - 8080:8080
     secrets:
+      - default-user-password
       - postgres-password
       - postgres-user
       - postgres-db
@@ -14,7 +15,7 @@ services:
       - otus_sn_api_network
 
   postgres:
-    image: postgres:16.1
+    image: postgres:16.1-alpine3.19
     restart: unless-stopped
     expose:
       - 5432
@@ -44,3 +45,5 @@ secrets:
     environment: "POSTGRES_USER"
   postgres-db:
     environment: "POSTGRES_DB"
+  default-user-password:
+    environment: "DEFAULT_USER_PASSWORD"

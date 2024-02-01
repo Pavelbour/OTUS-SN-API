@@ -1,4 +1,4 @@
-FROM amazoncorretto:21.0.1 AS build
+FROM amazoncorretto:21.0.2 AS build
 RUN yum update -y && yum install -y unzip openssl \
     && mkdir /opt/gradle \
     && curl -OL https://services.gradle.org/distributions/gradle-8.5-bin.zip \
@@ -15,7 +15,7 @@ RUN openssl genrsa -out keypair.pem 2048 \
 WORKDIR /var/app
 RUN /opt/gradle/gradle-8.5/bin/gradle bootJar
 
-FROM amazoncorretto:21-alpine3.18
+FROM amazoncorretto:21.0.2-alpine3.19
 WORKDIR /var/app
 COPY --from=build /var/app/build/libs/api-0.0.1-SNAPSHOT.jar app.jar
 CMD [ "java", "-jar", "app.jar" ]

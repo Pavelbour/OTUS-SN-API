@@ -6,7 +6,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Component
-public class RegisterNewUserRequestValidator  implements Validator {
+public class RegisterNewUserRequestValidator implements Validator {
 
     private static final int MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -20,9 +20,8 @@ public class RegisterNewUserRequestValidator  implements Validator {
         ValidationUtils.rejectIfEmpty(errors, "firstName", "Data invalid");
         ValidationUtils.rejectIfEmpty(errors, "password", "Data invalid");
         RegisterNewUserRequest request = (RegisterNewUserRequest) target;
-    if (request.password() != null && request.password().trim().length() < MINIMUM_PASSWORD_LENGTH) {
-        errors.rejectValue("password", "data.invalid");
+        if (request.password() != null && request.password().trim().length() < MINIMUM_PASSWORD_LENGTH) {
+            errors.rejectValue("password", "data.invalid");
+        }
     }
-    }
-    
 }
