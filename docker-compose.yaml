@@ -1,22 +1,31 @@
 services:
   app:
     restart: unless-stopped
-    build: .
+    build:
+      context: .
+      dockerfile: .docker/app/Dockerfile
     depends_on:
-      - postgres
+        postgres_replica_1:
+          condition: service_healthy
     ports:
       - 8080:8080
     secrets:
+      - default-postgres-user
       - default-user-password
-      - postgres-password
-      - postgres-user
       - postgres-db
     networks:
-      - otus_sn_api_network
+      otus_sn_api_network:
+        ipv4_address: 172.18.0.5
 
-  postgres:
-    image: postgres:16.1-alpine3.19
+  postgres_replica_1:
+    image: postgres:16.2-alpine3.19
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -d /var/lib/postgresql/replica-backup/pg_wal"]
+      start_period: 30s
+      start_interval: 30s
+      retries: 10
     expose:
       - 5432
     environment:
@@ -27,16 +36,81 @@ services:
       - postgres-password
       - postgres-user
       - postgres-db
+      - default-postgres-user
+      - default-user-password
+      - postgres-replicator-name
+      - postgres-replicator-login
+      - postgres-replicator-password
     volumes:
-      - otus_sn_api_postgres_data_volume:/var/lib/postgresql/data
+      - otus_sn_api_postgres_replica_1_data_volume:/var/lib/postgresql/data
+      - otus_sn_api_postgres_replica_backup_volume:/var/lib/postgresql/replica-backup
+      - .docker/postgres/config/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - .docker/postgres/config/primary/postgresql.conf:/etc/postgresql/postgresql.conf
+      - .docker/postgres/config/primary/configure-primary.sh:/docker-entrypoint-initdb.d/configure-primary.sh
     networks:
-      - otus_sn_api_network
+      otus_sn_api_network:
+        ipv4_address: 172.18.0.2
+
+  postgres_replica_2:
+      image: postgres:16.2-alpine3.19
+      user: postgres
+      command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+      restart: unless-stopped
+      depends_on:
+        postgres_replica_1:
+          condition: service_healthy
+      expose:
+        - 5432
+      environment:
+        - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+        - POSTGRES_USER_FILE=/run/secrets/postgres-user
+      secrets:
+        - postgres-password
+        - postgres-user
+        - postgres-db
+      volumes:
+        - otus_sn_api_postgres_replica_backup_volume:/var/lib/postgresql/data
+        - .docker/postgres/config/replicas/pg_hba.conf:/etc/postgresql/pg_hba.conf
+        - .docker/postgres/config/replicas/replica_1/postgresql.conf:/etc/postgresql/postgresql.conf
+      networks:
+        otus_sn_api_network:
+          ipv4_address: 172.18.0.3
+
+  postgres_replica_3:
+      image: postgres:16.2-alpine3.19
+      user: postgres
+      command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+      restart: unless-stopped
+      depends_on:
+        postgres_replica_1:
+          condition: service_healthy
+      expose:
+        - 5432
+      environment:
+        - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+        - POSTGRES_USER_FILE=/run/secrets/postgres-user
+      secrets:
+        - postgres-password
+        - postgres-user
+        - postgres-db
+      volumes:
+        - otus_sn_api_postgres_replica_backup_volume:/var/lib/postgresql/data
+        - .docker/postgres/config/replicas/pg_hba.conf:/etc/postgresql/pg_hba.conf
+        - .docker/postgres/config/replicas/replica_2/postgresql.conf:/etc/postgresql/postgresql.conf
+      networks:
+        otus_sn_api_network:
+          ipv4_address: 172.18.0.4
 
 networks:
   otus_sn_api_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.0/16"
 
 volumes:
-  otus_sn_api_postgres_data_volume:
+  otus_sn_api_postgres_replica_1_data_volume:
+  otus_sn_api_postgres_replica_backup_volume:
 
 secrets:
   postgres-password:
@@ -45,5 +119,13 @@ secrets:
     environment: "POSTGRES_USER"
   postgres-db:
     environment: "POSTGRES_DB"
+  default-postgres-user:
+    environment: "DEFAULT_POSTGRES_USER"
   default-user-password:
     environment: "DEFAULT_USER_PASSWORD"
+  postgres-replicator-name:
+    environment: "POSTGRES_REPLICATOR_NAME"
+  postgres-replicator-login:
+    environment: "POSTGRES_REPLICATOR_LOGIN"
+  postgres-replicator-password:
+    environment: "POSTGRES_REPLICATOR_PASSWORD"
