@@ -16,7 +16,7 @@
 - Регистрация нового пользователя. <code>curl -X POST http://localhost:8080/user/register --json '{
     "firstName": "Petya",
     "lastName": "Zotov",
-    "city": "Omsk",v
+    "city": "Omsk",
     "birthday":"1990-05-18",
     "biography": "Coder",
     "password": "Petya@password"
@@ -36,6 +36,6 @@
 
 ## Нагрузочное тестирование
 
-Отчёт по нагрузочному тестированию находится в папке [doc/performance-test](doc/performance-test). В папке [doc/performance-test/jmeter](doc/performance-test/jmeter) 
+Отчёт по нагрузочному тестированию и репликации находится в папке [doc/performance-test](doc/performance-test). В папке [doc/performance-test/jmeter](doc/performance-test/jmeter) 
  расположены тестовые планы для jmeter и отчёты сгенерированные им.
  

@@ -17,22 +17,22 @@ import javax.sql.DataSource;
 @Profile("default")
 public class DefaultJdbcConfiguration extends AbstractJdbcConfiguration {
 
-    @Bean
-    DataSourceInitializer initializer(DataSource dataSource) {
-        var initializer = new DataSourceInitializer();
-        initializer.setDataSource(dataSource);
+    // @Bean
+    // DataSourceInitializer initializer(DataSource dataSource) {
+    //     var initializer = new DataSourceInitializer();
+    //     initializer.setDataSource(dataSource);
 
-        var script = new ClassPathResource("default-schema.sql");
-        var populator = new ResourceDatabasePopulator(script);
-        initializer.setDatabasePopulator(populator);
+    //     var script = new ClassPathResource("default-schema.sql");
+    //     var populator = new ResourceDatabasePopulator(script);
+    //     initializer.setDatabasePopulator(populator);
 
-        return initializer;
-    }
+    //     return initializer;
+    // }
 
-    @Bean
-    CommandLineRunner initDatabase(DataLoadingService dataGenerator) {
-        return args -> {
-            dataGenerator.loadData();
-        };
-    }
+    // @Bean
+    // CommandLineRunner initDatabase(DataLoadingService dataGenerator) {
+    //     return args -> {
+    //         dataGenerator.loadData();
+    //     };
+    // }
 }

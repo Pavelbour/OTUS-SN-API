@@ -7,3 +7,8 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     city varchar(50),
     password varchar(100) NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS first_name_last_name_index ON users_tbl(
+    first_name varchar_pattern_ops,
+    last_name varchar_pattern_ops
+);
